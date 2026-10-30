@@ -1,0 +1,20 @@
+{
+  "no": 1,
+  "track": "vibe",
+  "title": "바이브코딩으로 수업용 모션 그래픽 만들기",
+  "summary": "바이브코딩으로 수업에 쓸 모션 그래픽을 만드는 법을 무료 라이브에서 함께 배우고, 내 수업 자료로 직접 만들어 보는 첫 번째 라이브 챌린지예요.",
+  "schedule": {
+    "vote": null,
+    "announce": "2026-10-26",
+    "live": "2026-11-01T20:00:00+09:00",
+    "end": "2026-11-15"
+  },
+  "hosts": [],
+  "links": {
+    "apply": "https://www.notiontalk.com/contents/community/live-challenge-motion-graphics/",
+    "replay": null,
+    "discord": null
+  },
+  "resources": [],
+  "lab": ["exp-001-rea-site-reverse"]
+}
