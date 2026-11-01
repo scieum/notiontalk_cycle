@@ -142,7 +142,8 @@ marked.use({
       // "> 💡 …"는 팁, "> ⚠️ …"는 주의. 앞 이모지는 왼쪽 아이콘이 돼요
       const m = quote.match(/^\s*<p>\s*(\p{Extended_Pictographic})\uFE0F?\s*/u);
       const name = (m && EMOJI_ICONS[m[1]]) || "bulb";
-      const body = m ? quote.replace(m[0], "<p>") : quote;
+      // 팁·주의 상자 안에서는 문장이 끝나면("요." 다음) 줄을 바꿔요
+      const body = (m ? quote.replace(m[0], "<p>") : quote).replace(/([요다]\.)\s+(?=[^<\s])/g, "$1<br>");
       return `<div class="note-box${name === "alert" ? " note-box--warn" : ""}">${ic(name, "note-ic")}<div>${body}</div></div>`;
     },
     heading(text, level) {
