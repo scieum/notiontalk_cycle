@@ -222,7 +222,8 @@ function partsHtml(parts) {
   const panels = parts.map(({ s, p }, i) => {
     const [icon] = splitIcon(s.title);
     const prev = parts[i - 1], next = parts[i + 1];
-    const link = (x, dir) => x ? `<a class="part-pg part-pg--${dir}" href="#part-${x.p.no}">${dir === "prev" ? ic("arrow-left") : ""}<span><small>${dir === "prev" ? "이전" : "다음"} 파트</small>파트 ${esc(x.p.no)} · ${esc(x.p.name)}</span>${dir === "next" ? ic("arrow-right") : ""}</a>` : "<span></span>";
+    // 첫 파트의 "이전", 마지막 파트의 "다음" 자리는 연수 흐름(홈)으로 돌아가는 버튼
+    const link = (x, dir) => x ? `<a class="part-pg part-pg--${dir}" href="#part-${x.p.no}">${dir === "prev" ? ic("arrow-left") : ""}<span><small>${dir === "prev" ? "이전" : "다음"} 파트</small>파트 ${esc(x.p.no)} · ${esc(x.p.name)}</span>${dir === "next" ? ic("arrow-right") : ""}</a>` : `<a class="part-pg part-pg--${dir} part-pg--home" href="#parts">${dir === "prev" ? ic("home") : ""}<span><small>처음 화면</small>홈으로 · 연수 흐름</span>${dir === "next" ? ic("home") : ""}</a>`;
     return `<section class="section part-panel" id="part-${p.no}" data-part aria-labelledby="part-${p.no}-t">
     <a class="part-back" href="#parts">${ic("arrow-left")}연수 흐름</a>
     <p class="part-kicker">파트 ${esc(p.no)} / ${parts.length}</p>

@@ -399,3 +399,5 @@ a:hover .go .ic, .row-head .more:hover .ic { transform: translateX(2px); }
 .more-fold { margin: 0 0 18px; }
 .more-fold.is-folded > .more-body { display: none; }
 .more-fold > .fold-toggle { display: flex; margin: 0 auto; }
+/* 영상이 하나뿐인 갤러리는 화면 너비 끝까지 */
+.gallery:has(> .gallery-item:only-child :is(video, .yt, iframe)) { grid-template-columns: 1fr; }
