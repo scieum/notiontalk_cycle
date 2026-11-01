@@ -17,6 +17,13 @@
     "replay": null,
     "discord": null
   },
-  "resources": [],
+  "resources": [
+    {
+      "type": "slides",
+      "title": "1회차 라이브 발표 자료 (PPT)",
+      "url": "/cycles/01-motion-graphics/notiontalk-cycle01-motion-graphics.pptx",
+      "note": "라이브에서 쓴 슬라이드"
+    }
+  ],
   "lab": []
 }
