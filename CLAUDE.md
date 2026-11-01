@@ -5,7 +5,7 @@
 
 ## 구조
 
-- `content/site.json` — 사이트 이름, 외부 링크(디스코드 등), 운영진 목록(`id`, `name`, `role`)
+- `content/site.json` — 사이트 이름, 외부 링크(디스코드 등), 운영진 목록(`id`, `name`, `role`, `photo`: `public/operators/` 프로필 사진, notiontalk.com 운영진 사진)
 - `content/cycles/<번호>-<영문슬러그>/` — 회차 하나 = 폴더 하나 (`meta.json` + `index.md` + 첨부 파일)
 - `content/lab/exp-<번호>-<영문슬러그>/` — 실험 노트 하나 = 폴더 하나
 - 폴더 이름이 `_`로 시작하거나 meta에 `"draft": true`면 빌드에서 빠진다. `_template` 폴더를 복사해서 시작한다.

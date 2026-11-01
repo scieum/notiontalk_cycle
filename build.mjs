@@ -103,6 +103,8 @@ const scheduleAttr = (s) =>
   `data-schedule='${esc(JSON.stringify({ announce: s.announce, live: s.live, end: s.end, review: s.review || null }))}'`;
 
 function avatar(op, cls = "") {
+  // 프로필 사진(site.json의 photo, notiontalk.com 운영진 사진)이 있으면 사진, 없으면 이름 첫 글자
+  if (op.photo) return `<img class="avatar avatar-${esc(op.id)} ${cls}" src="${esc(op.photo)}" alt="" aria-hidden="true">`;
   return `<span class="avatar avatar-${esc(op.id)} ${cls}" aria-hidden="true">${esc([...op.name][0])}</span>`;
 }
 

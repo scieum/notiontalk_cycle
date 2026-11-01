@@ -13,8 +13,8 @@
     "discord": null
   },
   "operators": [
-    { "id": "1000", "name": "1000쌤", "role": "마스터", "bio": "교사 생산성에 진심인 노션 전문가이자 AI 덕후" },
-    { "id": "gomgom", "name": "곰곰이샘", "role": "운영진", "bio": "노션톡 운영진" },
-    { "id": "chemi", "name": "케미가체질 쌤", "role": "운영진", "bio": "노션톡 운영진" }
+    { "id": "1000", "photo": "/operators/1000.webp", "name": "1000쌤", "role": "마스터", "bio": "교사 생산성에 진심인 노션 전문가이자 AI 덕후" },
+    { "id": "gomgom", "photo": "/operators/gomgom.webp", "name": "곰곰이샘", "role": "운영진", "bio": "노션톡 운영진" },
+    { "id": "chemi", "photo": "/operators/chemi.webp", "name": "케미가체질 쌤", "role": "운영진", "bio": "노션톡 운영진" }
   ]
 }

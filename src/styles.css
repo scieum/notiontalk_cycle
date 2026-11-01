@@ -161,6 +161,7 @@ a.card:hover { border-color: var(--ink); }
 .empty { padding: 24px; color: var(--faint); text-align: center; border-style: dashed; background: transparent; }
 
 .avatar { display: inline-grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; font-weight: 800; font-size: 15px; color: #fff; background: var(--muted); }
+img.avatar { object-fit: cover; background: var(--paper-2); }
 .avatar-xs { width: 18px; height: 18px; font-size: 10px; }
 .avatar-lg { width: 56px; height: 56px; font-size: 22px; }
 .avatar-1000, .avatar-team { background: #1c1917; }
