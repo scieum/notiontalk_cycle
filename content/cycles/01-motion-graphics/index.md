@@ -320,6 +320,13 @@ docs-first.mp4 | 방법 2 · 기획 문서부터 꼼꼼하게 | 문서·레퍼�
 
 ## 🔍 파트 3 · 레퍼런스 영상 분석을 통한 영상 제작하기
 
+```bookmarks
+Remotion | https://www.remotion.dev/ | React 코드로 영상을 만들고 MP4로 렌더링하는 도구
+Skillry · Opus 5.5 영상 모음 | https://skillry.dev/ai-videos/opus-5-5 | Claude Opus 5.5로 만든 화제의 영상과 다시 만든 결과, 실제 쓴 프롬프트
+Motion Prompt | https://showheyohtaki.github.io/motion-prompt/ | AI에게 부탁할 때 쓰는 효과 "이름" 사전 · 움직이는 견본과 요청 예시 (MIT)
+snapcn 컴포넌트 | https://snapcn.dev/docs/components | Remotion용 글자 애니메이션·자막·로고·장면 컴포넌트 모음
+```
+
 > 💡 이 파트 자료는 정리하고 있어요. 곧 채워 둘게요.
 
 ## ✨ 파트 4 · 다양한 스타일의 영상 제작
