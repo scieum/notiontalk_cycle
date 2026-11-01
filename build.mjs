@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { marked } from "marked";
 import { PHASES, kst, statusOf, timeText } from "./src/phase.js";
+import { DEMOS } from "./src/demos.mjs";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const CONTENT = path.join(ROOT, "content");
@@ -122,6 +123,8 @@ marked.use({
         const name = rest.join(" ") || "CLAUDE.md";
         return `<div class="mini-prompt file-block is-folded" data-fold><h3>${ic("file")}${esc(name)}</h3><pre><code>${esc(code)}</code></pre><button type="button" class="fold-toggle" data-fold-toggle aria-expanded="false"><span class="fold-more">전체 보기</span><span class="fold-less">접기</span></button><div class="file-actions"><a class="btn btn-sm" href="data:text/plain;charset=utf-8,${encodeURIComponent(code)}" download="${esc(name)}">${ic("download")}${esc(name)} 받기</a><button type="button" class="btn btn-secondary btn-sm" data-copy><span class="copy-idle">${ic("copy")}내용 복사</span><span class="copy-done">${ic("check")}복사됐어요</span></button></div></div>`;
       }
+      if (lang === "gallery") return galleryHtml(code, rest);
+      if (lang === "bookmarks") return bookmarksHtml(code);
       if (lang === "tree") return `<pre class="tree">${esc(code)}</pre>`;
       return `<pre class="code"><code>${esc(code)}</code></pre>`;
     },
@@ -140,11 +143,90 @@ marked.use({
       const body = m ? quote.replace(m[0], "<p>") : quote;
       return `<div class="note-box${name === "alert" ? " note-box--warn" : ""}">${ic(name, "note-ic")}<div>${body}</div></div>`;
     },
+    heading(text, level) {
+      // "### 방법 N · 이름", "### 주제 N · 이름"은 구역을 나누는 머리띠가 돼요 (2-1 같은 하위 단계는 그대로)
+      const m = level === 3 && text.match(/^(방법|주제)\s*(\d+)\s*·\s*(.+)$/);
+      if (m) return `<div class="method-head"><span class="method-no">${m[1]} ${m[2]}</span><h3>${m[3]}</h3></div>`;
+      if (level === 3 && text === "결과 비교") return `<div class="method-head method-head--cmp"><span class="method-no">비교</span><h3>방법 1 vs 방법 2</h3></div>`;
+      return `<h${level}>${text}</h${level}>`;
+    },
     table(header, body) {
       return `<div class="table-wrap"><table><thead>${header}</thead><tbody>${body}</tbody></table></div>`;
     },
   },
 });
+
+// ```gallery 블록: 한 줄에 "파일명 | 제목 | 설명". 파일은 지금 그리는 회차·실험 폴더 안에서 찾아요.
+// 영상 미리보기는 2초 장면(#t=2) — 흰 화면으로 시작하는 영상이 비어 보이지 않게.
+// 아직 없는 파일은 "준비 중" 칸으로 그리고 빌드에 경고를 띄워요
+let mediaCtx = null;
+const YT_RE = /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/;
+// 옵션: "3"은 한 줄에 3개, "fold"는 처음 두 줄만 보이고 전체 보기/접기 버튼
+function galleryHtml(code, opts = []) {
+  const cols = opts.includes("3") ? "3" : "";
+  const items = code.trim().split("\n").map((line) => line.split("|").map((x) => x.trim())).filter(([f]) => f);
+  const grid = `<div class="gallery${cols === "3" ? " gallery--3" : ""}">${items.map(([file, title = "", caption = ""]) => {
+    const yt = file.match(YT_RE);
+    // "demo:이름"은 src/demos.mjs의 스타일 예시 애니메이션
+    if (file.startsWith("demo:")) {
+      const name = file.slice(5);
+      if (!DEMOS[name]) console.warn(`  ! 없는 데모 "${name}" — src/demos.mjs에 추가하세요`);
+      return `<figure class="gallery-item"><div class="demo d-${esc(name)}" role="img" aria-label="${esc(title)} 예시">${DEMOS[name] || ""}</div><figcaption>${title ? `<strong>${esc(title)}</strong>` : ""}${caption ? `<span>${esc(caption)}</span>` : ""}</figcaption></figure>`;
+    }
+    const ext = /^https?:/.test(file);
+    const ready = ext || (mediaCtx && fs.existsSync(path.join(mediaCtx.folder, file)));
+    if (!ready) console.warn(`  ! 갤러리 파일 없음 "${file}" — ${mediaCtx?.folder || ""}에 넣어 주세요`);
+    const src = ext ? file : `${mediaCtx?.base || ""}${file}`;
+    // 유튜브는 썸네일만 먼저 보여주고, 누르면 그 자리에서 재생해요(app.js)
+    const media = yt
+      ? `<button type="button" class="yt" data-yt="${yt[1]}" aria-label="${esc(title)} 영상 재생"><img src="https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg" alt="" loading="lazy"><span class="yt-play">${ic("play")}</span></button>`
+      : !ready
+        ? `<div class="gallery-ph">${ic("play")}<span>영상 준비 중</span></div>`
+        : /\.(mp4|webm|mov)$/i.test(file)
+          ? `<video src="${esc(src)}#t=2" controls muted loop playsinline preload="metadata" aria-label="${esc(title)}"></video>`
+          : `<img src="${esc(src)}" alt="${esc(title)}" loading="lazy">`;
+    const link = yt ? `<a class="yt-link" href="https://www.youtube.com/watch?v=${yt[1]}" target="_blank" rel="noopener">유튜브에서 보기${ic("external")}</a>` : "";
+    return `<figure class="gallery-item">${media}${title || caption ? `<figcaption>${title ? `<strong>${esc(title)}</strong>` : ""}${caption ? `<span>${esc(caption)}</span>` : ""}${link}</figcaption>` : ""}</figure>`;
+  }).join("")}</div>`;
+  if (!opts.includes("fold") || items.length <= 6) return grid;
+  return `<div class="gallery-fold is-folded" data-fold>${grid}<button type="button" class="btn btn-secondary btn-sm fold-toggle" data-fold-toggle aria-expanded="false"><span class="fold-more">전체 보기 (${items.length}개)</span><span class="fold-less">접기</span></button></div>`;
+}
+
+// ```bookmarks 블록: 한 줄에 "이름 | 주소 | 설명". 파트마다 필요한 사이트를 북마크 카드로
+function bookmarksHtml(code) {
+  const items = code.trim().split("\n").map((line) => line.split("|").map((x) => x.trim())).filter(([n, u]) => n && u);
+  return `<div class="bookmarks"><p class="bm-label">${ic("link")}필요한 사이트</p><ul>${items.map(([name, url, note = ""]) => {
+    let host = url;
+    try { host = new URL(url).hostname.replace(/^www\./, ""); } catch {}
+    return `<li><a class="card bookmark" href="${esc(url)}" target="_blank" rel="noopener"><span class="res-main"><span class="card-title">${esc(name)}</span>${note ? `<span class="card-desc">${esc(note)}</span>` : ""}<span class="bm-host">${esc(host)}</span></span><span class="go">${ic("external")}</span></a></li>`;
+  }).join("")}</ul></div>`;
+}
+
+// "## 파트 N · 이름" 섹션은 연수 흐름 목록 + 클릭하면 그 파트만 보이는 화면이 돼요
+const PART_RE = /^파트\s*(\d+)\s*[·:.\-]?\s*/;
+function partOf(s) {
+  const m = plain(s.title).match(PART_RE);
+  return m ? { no: m[1], name: plain(s.title).slice(m[0].length) } : null;
+}
+function partsHtml(parts) {
+  const nav = `<section class="section" id="parts" aria-labelledby="parts-t">
+    ${sectionTitle("parts-t", "map", "연수 흐름")}
+    <ol class="steps part-nav">${parts.map(({ s, p }) => `<li><a href="#part-${p.no}"><span><strong>파트 ${esc(p.no)}</strong> · ${esc(p.name)}</span><span class="go">${ic("arrow-right")}</span></a></li>`).join("")}</ol>
+  </section>`;
+  const panels = parts.map(({ s, p }, i) => {
+    const [icon] = splitIcon(s.title);
+    const prev = parts[i - 1], next = parts[i + 1];
+    const link = (x, dir) => x ? `<a class="part-pg part-pg--${dir}" href="#part-${x.p.no}">${dir === "prev" ? ic("arrow-left") : ""}<span><small>${dir === "prev" ? "이전" : "다음"} 파트</small>파트 ${esc(x.p.no)} · ${esc(x.p.name)}</span>${dir === "next" ? ic("arrow-right") : ""}</a>` : "<span></span>";
+    return `<section class="section part-panel" id="part-${p.no}" data-part aria-labelledby="part-${p.no}-t">
+    <a class="part-back" href="#parts">${ic("arrow-left")}연수 흐름</a>
+    <p class="part-kicker">파트 ${esc(p.no)} / ${parts.length}</p>
+    ${sectionTitle(`part-${p.no}-t`, icon, p.name)}
+    ${md(s.body)}
+    <nav class="part-pager" aria-label="파트 이동">${link(prev, "prev")}${link(next, "next")}</nav>
+  </section>`;
+  }).join("");
+  return nav + panels;
+}
 
 // "## " 제목마다 섹션으로 나눠요. "자주 묻는" 섹션은 ### 질문을 아코디언으로 바꿔요.
 function sections(md) {
@@ -183,6 +265,18 @@ function sectionHtml(s) {
     ${sectionTitle(`${s.id}-t`, isFaq ? "help" : icon, text)}
     ${isFaq ? faqHtml(s.body) : md(s.body)}
   </section>`;
+}
+
+// 파트 섹션은 처음 나온 자리에 연수 흐름 + 파트 화면으로 모아 그려요
+function bodySections(list) {
+  const parts = list.map((s) => ({ s, p: partOf(s) })).filter((x) => x.p);
+  let placed = false;
+  return list.map((s) => {
+    if (!partOf(s)) return sectionHtml(s);
+    if (placed) return "";
+    placed = true;
+    return partsHtml(parts);
+  }).join("");
 }
 
 function jumpNav(items) {
@@ -292,7 +386,7 @@ function empty(text) {
 /* ── 레이아웃 ─────────────────────────── */
 
 // 노션 로고(Simple Icons) — 글자색을 따라가요
-const LOGO = `<svg class="logo-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg><span class="logo-word">notiontalk</span><span class="logo-sub">challenge</span>`;
+const LOGO = `<img class="logo-mark" src="/logo.png" alt="" width="22" height="22"><span class="logo-word">notiontalk</span><span class="logo-sub">challenge</span>`;
 
 function layout({ title, description, body, path: pagePath, active, back, bodyClass = "" }) {
   const fullTitle = title ? `${title} | ${site.name}` : site.name;
@@ -313,11 +407,13 @@ function layout({ title, description, body, path: pagePath, active, back, bodyCl
 <meta property="og:url" content="${esc(site.url + pagePath)}">
 <meta property="og:locale" content="ko_KR">
 <link rel="canonical" href="${esc(site.url + pagePath)}">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#f4f4f4">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="/assets/styles.css?v=${VERSION}">
+<link rel="stylesheet" href="/assets/demos.css?v=${VERSION}">
 <script type="module" src="/assets/app.js?v=${VERSION}"></script>
 </head>
 <body class="${bodyClass}">
@@ -445,11 +541,10 @@ function cyclePage(c) {
   const hosts = (c.hosts || []).map((id) => operators[id]).filter(Boolean);
   const hostNames = hosts.length ? hosts.map((h) => esc(h.name)).join(", ") : "노션톡 운영진";
   const { intro, list } = sections(c.body);
+  mediaCtx = { base: `/cycles/${c.slug}/`, folder: c.folder };
   const resources = [...(c.resources || [])];
   if (c.links?.replay && !resources.some((r) => r.type === "replay")) resources.unshift({ type: "replay", title: "라이브 다시보기", url: c.links.replay });
   const actions = c.links?.replay ? `<a class="btn" href="${esc(c.links.replay)}" target="_blank" rel="noopener">${ic("play")}다시보기${ic("external", "ic-sm")}</a>` : "";
-
-  const jump = [...list.map((s) => [s.id, plain(s.title)]), ["files", "받아가기"], ...(related.length ? [["notes", "실험 노트"]] : [])];
 
   return layout({
     title: `${c.no}회차 · ${c.title}`,
@@ -461,14 +556,12 @@ function cyclePage(c) {
 <section class="recipe-hero">
   <p class="kicker">${ic("package")}${c.no}회차 자료 · ${esc(TRACKS[c.track]?.label || c.track)}</p>
   <h1>${esc(c.title)}</h1>
-  <p class="lead"><strong>${esc(c.lead || c.summary)}</strong>${c.leadSub ? `<br>${esc(c.leadSub)}` : ""}</p>
-  <p class="byline">진행 ${hostNames} · 라이브 ${fmtDate(c.schedule.live)}</p>
+  ${c.lead ? `<p class="lead"><strong>${esc(c.lead)}</strong>${c.leadSub ? `<br>${esc(c.leadSub)}` : ""}</p>` : ""}
   ${showcase(c)}
   ${actions ? `<div class="file-actions">${actions}</div>` : ""}
-  ${jumpNav(jump)}
 </section>
 ${intro ? `<section class="section">${md(intro)}</section>` : ""}
-${list.map(sectionHtml).join("")}
+${bodySections(list)}
 <section class="section" id="files" aria-labelledby="files-t">
   ${sectionTitle("files-t", "download", "받아가기")}
   ${resourceBlock(resources)}
@@ -492,6 +585,7 @@ function labPage(l) {
   const op = operators[l.author];
   const cycle = cycles.find((c) => c.slug === l.cycle);
   const { intro, list } = sections(l.body);
+  mediaCtx = { base: `/lab/${l.slug}/`, folder: l.folder };
   const files = (l.files || []).map((f) => ({ type: f.type || "file", ...f }));
   const jump = [...list.map((s) => [s.id, plain(s.title)]), ...(files.length ? [["files", "받아가기"]] : [])];
   return layout({
@@ -546,6 +640,12 @@ function copy(src, dest) {
     fs.mkdirSync(dest, { recursive: true });
     for (const name of fs.readdirSync(src)) copy(path.join(src, name), path.join(dest, name));
   } else {
+    // OneDrive "클라우드에만" 파일은 읽다가 멈춰요. 내용이 없으면(blocks 0) 건너뛰고 알려줘요
+    const st = fs.statSync(src);
+    if (st.size > 0 && st.blocks === 0) {
+      console.warn(`  ! 클라우드에만 있는 파일이라 건너뜀: ${path.relative(ROOT, src)} — OneDrive에서 "항상 이 장치에 유지"로 바꿔 주세요`);
+      return;
+    }
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.copyFileSync(src, dest);
   }
@@ -561,7 +661,7 @@ function copyAttachments(entry, base) {
 
 fs.rmSync(DIST, { recursive: true, force: true });
 fs.mkdirSync(path.join(DIST, "assets"), { recursive: true });
-for (const f of ["styles.css", "app.js", "phase.js", "hero.js"]) fs.copyFileSync(path.join(ROOT, "src", f), path.join(DIST, "assets", f));
+for (const f of ["styles.css", "demos.css", "app.js", "phase.js", "hero.js"]) fs.copyFileSync(path.join(ROOT, "src", f), path.join(DIST, "assets", f));
 copy(ICON_DIR, path.join(DIST, "assets", "icons"));
 if (fs.existsSync(path.join(ROOT, "public"))) copy(path.join(ROOT, "public"), DIST);
 

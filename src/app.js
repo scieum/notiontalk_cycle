@@ -81,10 +81,12 @@ document.querySelectorAll("[data-fold-toggle]").forEach((btn) => {
   const box = btn.closest("[data-fold]");
   const pre = box.querySelector("pre");
   // 짧은 파일은 접을 필요가 없어요
-  if (pre.scrollHeight <= pre.clientHeight + 4) { box.classList.remove("is-folded"); btn.hidden = true; return; }
+  if (pre && pre.scrollHeight <= pre.clientHeight + 4) { box.classList.remove("is-folded"); btn.hidden = true; return; }
   btn.addEventListener("click", () => {
     const folded = box.classList.toggle("is-folded");
     btn.setAttribute("aria-expanded", String(!folded));
+    // 갤러리를 접으면 갤러리 첫머리로 돌아가요
+    if (folded && !pre && box.getBoundingClientRect().top < 0) box.scrollIntoView({ block: "start" });
   });
 });
 
@@ -101,3 +103,43 @@ if (track) {
   // 화면 폭과 상관없이 같은 빠르기(초당 px)로 흐르게
   track.style.animationDuration = group.scrollWidth / (window.innerWidth < 640 ? 70 : 110) + "s";
 }
+
+/* ── 회차 파트: 연수 흐름에서 파트를 누르면 그 파트만 보여요 (#part-N) ── */
+const partPanels = [...document.querySelectorAll("[data-part]")];
+if (partPanels.length) {
+  document.body.classList.add("has-parts");
+  const showPart = () => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const open = partPanels.find((p) => p.id === id);
+    partPanels.forEach((p) => p.classList.toggle("is-open", p === open));
+    document.body.classList.toggle("part-open", !!open);
+    if (open) window.scrollTo(0, 0);
+    else if (id) document.getElementById(id)?.scrollIntoView();
+  };
+  addEventListener("hashchange", showPart);
+  showPart();
+}
+
+/* ── 갤러리 유튜브: 누르면 그 자리에서 재생 ── */
+document.querySelectorAll("[data-yt]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const f = document.createElement("iframe");
+    f.src = `https://www.youtube-nocookie.com/embed/${btn.dataset.yt}?autoplay=1&rel=0`;
+    f.title = btn.getAttribute("aria-label") || "유튜브 영상";
+    f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+    f.allowFullscreen = true;
+    btn.replaceWith(f);
+  });
+});
+
+/* ── 텍스트 스크램블 데모: 글자가 뒤섞이다 제자리로 ── */
+document.querySelectorAll("[data-scramble]").forEach((el) => {
+  const target = el.dataset.scramble;
+  const chars = "!<>-_\\/[]{}=+*^?#ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let frame = 0;
+  setInterval(() => {
+    frame = (frame + 1) % 60;
+    const settled = Math.max(0, frame - 10) / 2;
+    el.textContent = [...target].map((c, i) => (i < settled ? c : chars[Math.floor(Math.random() * chars.length)])).join("");
+  }, 60);
+});
