@@ -19,23 +19,8 @@
 
   const hero = document.getElementById("hero");
   const wm = document.getElementById("wordmark");
-  const hint = document.getElementById("hint");
   if (!hero || !wm) return;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { if (hint) hint.hidden = true; return; }
-
-  const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  const HINTS = {
-    idle: canHover ? "커서로 글자를 휘저어 보세요" : "가로로 쓸어서 글자를 흩뜨려 보세요",
-    messy: "가만히 두면 노션처럼 다시 정리돼요",
-    tidy: "다시 정리됐어요",
-  };
-  const hintText = hint?.querySelector(".hint-text");
-  const setHint = (t) => {
-    if (!hintText) return;
-    hintText.textContent = t;
-    hint.classList.toggle("is-done", t === HINTS.tidy);
-  };
-  setHint(HINTS.idle);
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   const letters = [...wm.querySelectorAll(".lt")].map((el) => ({
     el, home: null, state: "pinned", body: null,
@@ -45,7 +30,7 @@
   let M = null, engine = null, cursorBody = null, ground = null, walls = [];
   let W = 0, H = 0;
   const cur = { x: -999, y: -999, px: -999, py: -999, vx: 0, vy: 0, active: false };
-  let lastTouch = 0, raf = 0, lastT = 0, acc = 0, quietSince = 0, tidyTimer = 0;
+  let lastTouch = 0, raf = 0, lastT = 0, acc = 0, quietSince = 0;
 
   /* ── 크기 맞추기·위치 재기 ─────────────── */
   function fit() {
@@ -122,7 +107,6 @@
     Composite.add(engine.world, b);
     l.body = b; l.state = "free";
     l.wob = { x: 0, y: 0, a: 0, vx: 0, vy: 0, va: 0 };
-    setHint(HINTS.messy);
   }
 
   function touchLetters(speed) {
@@ -205,11 +189,6 @@
         if (k >= 1) {
           l.state = "pinned"; l.ret = null; l.el.style.transform = "";
           l.el.classList.remove("is-snap"); void l.el.offsetWidth; l.el.classList.add("is-snap");
-          if (!letters.some((x) => x.state !== "pinned")) {
-            setHint(HINTS.tidy);
-            clearTimeout(tidyTimer);
-            tidyTimer = setTimeout(() => setHint(HINTS.idle), 2200);
-          }
         }
       }
     }

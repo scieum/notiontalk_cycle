@@ -118,6 +118,10 @@ marked.use({
         const label = rest.join(" ") || "프롬프트";
         return `<div class="mini-prompt"><h3>${ic("prompt")}${esc(label)}</h3><pre><code>${esc(code)}</code></pre><button type="button" class="btn btn-secondary btn-sm" data-copy><span class="copy-idle">${ic("copy")}복사</span><span class="copy-done">${ic("check")}복사됐어요</span></button></div>`;
       }
+      if (lang === "file") {
+        const name = rest.join(" ") || "CLAUDE.md";
+        return `<div class="mini-prompt file-block is-folded" data-fold><h3>${ic("file")}${esc(name)}</h3><pre><code>${esc(code)}</code></pre><button type="button" class="fold-toggle" data-fold-toggle aria-expanded="false"><span class="fold-more">전체 보기</span><span class="fold-less">접기</span></button><div class="file-actions"><a class="btn btn-sm" href="data:text/plain;charset=utf-8,${encodeURIComponent(code)}" download="${esc(name)}">${ic("download")}${esc(name)} 받기</a><button type="button" class="btn btn-secondary btn-sm" data-copy><span class="copy-idle">${ic("copy")}내용 복사</span><span class="copy-done">${ic("check")}복사됐어요</span></button></div></div>`;
+      }
       if (lang === "tree") return `<pre class="tree">${esc(code)}</pre>`;
       return `<pre class="code"><code>${esc(code)}</code></pre>`;
     },
@@ -195,17 +199,17 @@ function blocks(x, y, color) {
 function cycleThumb(c) {
   const vibe = c.track === "vibe";
   return `<svg class="thumb-svg" viewBox="0 0 240 300" role="img" aria-label="${c.no}회차 ${esc(TRACKS[c.track]?.short || "")}">
-    <rect width="240" height="300" fill="${vibe ? "#F9E4D2" : "#DCE8F8"}"/>
-    <text x="22" y="44" class="t-label" fill="${vibe ? "#B4501A" : "#1F5BB8"}">${esc(TRACKS[c.track]?.label || "")}</text>
+    <rect width="240" height="300" fill="${vibe ? "#F6ECE2" : "#E2EEED"}"/>
+    <text x="22" y="44" class="t-label" fill="${vibe ? "#96613A" : "#1F5D5C"}">${esc(TRACKS[c.track]?.label || "")}</text>
     <text x="16" y="196" class="t-num">${pad2(c.no)}</text>
-    ${blocks(22, 222, vibe ? "#B4501A" : "#1F5BB8")}
+    ${blocks(22, 222, vibe ? "#96613A" : "#1F5D5C")}
   </svg>`;
 }
 
 function labThumb(l) {
   const n = (l.code.match(/\d+/) || ["0"])[0].replace(/^0+(?=\d)/, "");
   return `<svg class="thumb-svg" viewBox="0 0 240 300" role="img" aria-label="${esc(l.code)}">
-    <rect width="240" height="300" fill="#FBF0C4"/>
+    <rect width="240" height="300" fill="#FBEFC0"/>
     <text x="22" y="44" class="t-label" fill="#7A5A00">LAB NOTE</text>
     <text x="16" y="196" class="t-num">${esc(pad2(n))}</text>
     ${blocks(22, 222, "#7A5A00")}
@@ -287,7 +291,8 @@ function empty(text) {
 
 /* ── 레이아웃 ─────────────────────────── */
 
-const LOGO = `<span class="logo-mark" aria-hidden="true"></span><span class="logo-word">notiontalk</span><span class="logo-sub">challenge</span>`;
+// 노션 로고(Simple Icons) — 글자색을 따라가요
+const LOGO = `<svg class="logo-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg><span class="logo-word">notiontalk</span><span class="logo-sub">challenge</span>`;
 
 function layout({ title, description, body, path: pagePath, active, back, bodyClass = "" }) {
   const fullTitle = title ? `${title} | ${site.name}` : site.name;
@@ -309,7 +314,7 @@ function layout({ title, description, body, path: pagePath, active, back, bodyCl
 <meta property="og:locale" content="ko_KR">
 <link rel="canonical" href="${esc(site.url + pagePath)}">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="theme-color" content="#faf8f3">
+<meta name="theme-color" content="#f4f4f4">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="/assets/styles.css?v=${VERSION}">
@@ -337,11 +342,13 @@ ${body}
 
 /* ── 홈 ───────────────────────────────── */
 
-const MARQUEE = ["노션 챌린지", "바이브코딩 챌린지", "2주에 한 주제", "배우고 나누고 함께 자라요"];
+// 오디씨처럼 짧은 영어 소문자 키워드 + 로고 블록 마크 구분자
+const MARQUEE = ["notion", "vibe coding", "two weeks, one topic", "learn together"];
+const MQ_MARK = `<svg class="mq-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="5.5"/><path d="M7 9.5h10M7 14.5h10"/></svg>`;
 
 function homePage() {
   const letters = [..."notiontalk"].map((ch, i) => `<span class="lt" data-i="${i}">${ch}</span>`).join("");
-  const mq = MARQUEE.map((t, i) => `<span>${esc(t)}</span><i class="mq-dot ${i % 2 ? "is-vibe" : "is-notion"}"></i>`).join("");
+  const mq = MARQUEE.map((t) => `<span>${esc(t)}</span>${MQ_MARK}`).join("");
   return layout({
     title: "",
     path: "/",
@@ -350,7 +357,6 @@ function homePage() {
 <section class="hero" id="hero" aria-labelledby="hero-title">
   <h1 id="hero-title" class="sr-only">${esc(site.name)}: 노션톡 라이브 챌린지 자료실</h1>
   <div class="wordmark" id="wordmark" role="img" aria-label="notiontalk">${letters}</div>
-  <p class="hero-hint" id="hint" aria-hidden="true"><span class="hint-text">커서로 글자를 휘저어 보세요</span>${ic("sparkles", "hint-ic")}</p>
 </section>
 
 <div class="marquee" role="note" aria-label="${esc(MARQUEE.join(", "))}">
@@ -408,7 +414,7 @@ function flowList(c) {
 }
 
 function resourceBlock(items) {
-  if (!items.length) return `<div class="note-box">${ic("bulb", "note-ic")}<div><p>라이브가 끝나면 다시보기, 발표 자료, 따라 할 프롬프트를 여기에 올려요.</p></div></div>`;
+  if (!items.length) return `<div class="note-box">${ic("bulb", "note-ic")}<div><p>다시보기, 발표 자료, 따라 할 프롬프트를 정리해서 여기에 올려요.</p></div></div>`;
   return `<ul class="resources">${items.map((r) => {
     const ext = /^https?:/.test(r.url);
     const [tIcon, tLabel] = RESOURCE_TYPES[r.type] || ["file", r.type];
@@ -419,22 +425,31 @@ function resourceBlock(items) {
   }).join("")}</ul>`;
 }
 
+// 오디씨의 "받은 이미지 → 결과"처럼 전/후를 나란히 (meta.showcase, 회차 폴더 안 파일)
+function showcase(c) {
+  const s = c.showcase;
+  if (!s?.before?.file || !s?.after?.file) return "";
+  const media = (m) => {
+    const src = `/cycles/${c.slug}/${m.file}`;
+    return /\.(mp4|webm|mov)$/i.test(m.file)
+      ? `<video src="${esc(src)}" autoplay muted loop playsinline></video>`
+      : `<img src="${esc(src)}" alt="${esc(m.caption || "")}" loading="lazy">`;
+  };
+  const fig = (m) => `<figure>${media(m)}${m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : ""}</figure>`;
+  return `<div class="showcase">${fig(s.before)}<span class="showcase-arrow">${ic("arrow-right")}</span>${fig(s.after)}</div>`;
+}
+
+// 회차 페이지는 오디씨 레시피처럼: 한 줄 요약 → 전/후 → 준비물 → 사용법 → 지침 파일 → 프롬프트 → 자주 묻는 질문 → 받아가기
 function cyclePage(c) {
-  const st = statusOf(c.schedule);
   const related = labs.filter((l) => l.cycle === c.slug || (c.lab || []).includes(l.slug));
   const hosts = (c.hosts || []).map((id) => operators[id]).filter(Boolean);
+  const hostNames = hosts.length ? hosts.map((h) => esc(h.name)).join(", ") : "노션톡 운영진";
   const { intro, list } = sections(c.body);
   const resources = [...(c.resources || [])];
   if (c.links?.replay && !resources.some((r) => r.type === "replay")) resources.unshift({ type: "replay", title: "라이브 다시보기", url: c.links.replay });
-  const discord = c.links?.discord || site.links.discord;
+  const actions = c.links?.replay ? `<a class="btn" href="${esc(c.links.replay)}" target="_blank" rel="noopener">${ic("play")}다시보기${ic("external", "ic-sm")}</a>` : "";
 
-  const actions = [
-    c.links?.apply && st.phase < 3 ? `<a class="btn" href="${esc(c.links.apply)}" target="_blank" rel="noopener">${ic("radio")}무료 라이브 신청${ic("external", "ic-sm")}</a>` : "",
-    c.links?.replay ? `<a class="btn" href="${esc(c.links.replay)}" target="_blank" rel="noopener">${ic("play")}다시보기${ic("external", "ic-sm")}</a>` : "",
-    discord ? `<a class="btn btn-secondary" href="${esc(discord)}" target="_blank" rel="noopener">${ic("chat")}디스코드에 결과 올리기${ic("external", "ic-sm")}</a>` : "",
-  ].join("");
-
-  const jump = [["flow", "흐름"], ...list.map((s) => [s.id, plain(s.title)]), ["files", "자료"], ...(related.length ? [["notes", "실험 노트"]] : [])];
+  const jump = [...list.map((s) => [s.id, plain(s.title)]), ["files", "받아가기"], ...(related.length ? [["notes", "실험 노트"]] : [])];
 
   return layout({
     title: `${c.no}회차 · ${c.title}`,
@@ -444,35 +459,29 @@ function cyclePage(c) {
     back: ["/cycles/", "회차 목록"],
     body: `<div class="wrap">
 <section class="recipe-hero">
-  <p class="kicker">${ic("calendar")}${c.no}회차 · ${esc(TRACKS[c.track]?.label || c.track)} ${statusPill(c.schedule)}</p>
+  <p class="kicker">${ic("package")}${c.no}회차 자료 · ${esc(TRACKS[c.track]?.label || c.track)}</p>
   <h1>${esc(c.title)}</h1>
-  <p class="lead"><strong>${esc(c.lead || c.summary)}</strong></p>
-  <dl class="facts">
-    <div><dt>무료 라이브</dt><dd>${fmtDate(c.schedule.live)} ${fmtTime(c.schedule.live)}</dd></div>
-    <div><dt>적용 · 공유</dt><dd>${fmtShort(c.schedule.live)} ~ ${fmtShort(c.schedule.end)}</dd></div>
-    <div><dt>지금</dt><dd data-count ${scheduleAttr(c.schedule)}>${esc(st.count)}</dd></div>
-  </dl>
+  <p class="lead"><strong>${esc(c.lead || c.summary)}</strong>${c.leadSub ? `<br>${esc(c.leadSub)}` : ""}</p>
+  <p class="byline">진행 ${hostNames} · 라이브 ${fmtDate(c.schedule.live)}</p>
+  ${showcase(c)}
   ${actions ? `<div class="file-actions">${actions}</div>` : ""}
   ${jumpNav(jump)}
 </section>
 ${intro ? `<section class="section">${md(intro)}</section>` : ""}
-<section class="section" id="flow" aria-labelledby="flow-t">
-  ${sectionTitle("flow-t", "map", "챌린지 흐름 한눈에")}
-  ${flowList(c)}
-</section>
 ${list.map(sectionHtml).join("")}
 <section class="section" id="files" aria-labelledby="files-t">
-  ${sectionTitle("files-t", "package", "회차 자료")}
+  ${sectionTitle("files-t", "download", "받아가기")}
   ${resourceBlock(resources)}
 </section>
 ${related.length ? `<section class="section" id="notes" aria-labelledby="notes-t">${sectionTitle("notes-t", "flask", "이 회차 실험 노트")}${related.map(labCard).join("")}</section>` : ""}
 <aside class="maker" aria-label="진행">
   ${hosts.length ? hosts.map((h) => avatar(h, "avatar-lg")).join("") : `<span class="avatar avatar-lg avatar-team" aria-hidden="true">N</span>`}
   <div>
-    <p>진행: <strong>${hosts.length ? hosts.map((h) => esc(h.name)).join(", ") : "노션톡 운영진"}</strong></p>
+    <p>진행: <strong>${hostNames}</strong></p>
     <p class="ask">이번 회차에서 만든 결과물, 디스코드에 올려주시면 구경 갈게요 ${ic("heart", "ic-inline ic-heart")}</p>
   </div>
 </aside>
+<p class="back-link"><a href="/cycles/">${ic("arrow-left")}다른 회차 자료 보러 가기</a></p>
 </div>`,
   });
 }

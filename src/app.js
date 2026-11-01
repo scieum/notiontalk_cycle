@@ -76,6 +76,18 @@ document.querySelectorAll("[data-flow]").forEach((list) => {
   });
 });
 
+/* ── 지침 파일 접기/펼치기 ─────────────── */
+document.querySelectorAll("[data-fold-toggle]").forEach((btn) => {
+  const box = btn.closest("[data-fold]");
+  const pre = box.querySelector("pre");
+  // 짧은 파일은 접을 필요가 없어요
+  if (pre.scrollHeight <= pre.clientHeight + 4) { box.classList.remove("is-folded"); btn.hidden = true; return; }
+  btn.addEventListener("click", () => {
+    const folded = box.classList.toggle("is-folded");
+    btn.setAttribute("aria-expanded", String(!folded));
+  });
+});
+
 /* ── 흐르는 띠: 화면 폭만큼 복제 ─────────── */
 const track = document.querySelector(".marquee-track");
 if (track) {
@@ -86,4 +98,6 @@ if (track) {
   }
   const clone = group.cloneNode(true);
   track.appendChild(clone);
+  // 화면 폭과 상관없이 같은 빠르기(초당 px)로 흐르게
+  track.style.animationDuration = group.scrollWidth / (window.innerWidth < 640 ? 70 : 110) + "s";
 }

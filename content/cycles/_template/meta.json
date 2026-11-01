@@ -3,6 +3,9 @@
   "track": "notion",
   "title": "회차 제목",
   "summary": "한두 문장 소개",
+  "lead": "상단 굵은 한 줄 (없으면 summary)",
+  "leadSub": "그 아래 한 줄",
+  "showcase": null,
   "schedule": {
     "vote": null,
     "announce": "2026-01-01",
