@@ -688,7 +688,6 @@ https://mcp.higgsfield.ai/mcp
 
 ```gallery
 atom-model.mp4 | 원자모형 변천사 · 본편 | 2분 4초 (1920×1080)
-atom-30s.mp4 | 원자모형 변천사 · 30초 요약판 | 1080×800
 ```
 
 **① 한 번에 기획 요청하기**
