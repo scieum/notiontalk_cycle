@@ -569,10 +569,10 @@ function cyclePage(c) {
 </section>
 ${intro ? `<section class="section">${md(intro)}</section>` : ""}
 ${bodySections(list)}
-<section class="section" id="files" aria-labelledby="files-t">
+${resources.length ? `<section class="section" id="files" aria-labelledby="files-t">
   ${sectionTitle("files-t", "download", "받아가기")}
   ${resourceBlock(resources)}
-</section>
+</section>` : ""}
 ${related.length ? `<section class="section" id="notes" aria-labelledby="notes-t">${sectionTitle("notes-t", "flask", "이 회차 실험 노트")}${related.map(labCard).join("")}</section>` : ""}
 <aside class="maker" aria-label="진행">
   ${hosts.length ? hosts.map((h) => avatar(h, "avatar-lg")).join("") : `<span class="avatar avatar-lg avatar-team" aria-hidden="true">N</span>`}

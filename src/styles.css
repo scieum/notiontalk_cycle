@@ -401,3 +401,5 @@ a:hover .go .ic, .row-head .more:hover .ic { transform: translateX(2px); }
 .more-fold > .fold-toggle { display: flex; margin: 0 auto; }
 /* 영상이 하나뿐인 갤러리는 화면 너비 끝까지 */
 .gallery:has(> .gallery-item:only-child :is(video, .yt, iframe)) { grid-template-columns: 1fr; }
+/* 받아가기 목록은 다른 카드와 왼쪽 끝을 맞춰요 */
+.section ul.resources { padding-left: 0; }

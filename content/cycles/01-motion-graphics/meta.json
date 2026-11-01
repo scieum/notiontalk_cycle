@@ -17,13 +17,6 @@
     "replay": null,
     "discord": null
   },
-  "resources": [
-    {
-      "type": "file",
-      "title": "실험에 쓴 노션톡 로고",
-      "url": "/cycles/01-motion-graphics/logo.png",
-      "note": "프롬프트와 함께 첨부한 로고 이미지 (PNG)"
-    }
-  ],
+  "resources": [],
   "lab": []
 }
