@@ -148,7 +148,7 @@ marked.use({
     },
     heading(text, level) {
       // "### 방법·주제·단계 N · 이름"은 구역을 나누는 머리띠가 돼요 (2-1 같은 하위 단계는 그대로)
-      const m = level === 3 && text.match(/^(방법|주제|단계)\s*(\d+)\s*·\s*(.+)$/);
+      const m = level === 3 && text.match(/^(방법|주제|단계|예시)\s*(\d+)\s*·\s*(.+)$/);
       if (m) return `<div class="method-head"><span class="method-no">${m[1]} ${m[2]}</span><h3>${m[3]}</h3></div>`;
       // "### 비교 · 이름"은 노란 비교 머리띠
       const cmp = level === 3 && text.match(/^비교\s*·\s*(.+)$/);

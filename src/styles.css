@@ -377,7 +377,7 @@ a:hover .go .ic, .row-head .more:hover .ic { transform: translateX(2px); }
 .yt-play .ic { width: 40px; height: 40px; padding: 10px; border-radius: 50%; background: rgba(0,0,0,.55); }
 .yt:hover .yt-play { background: rgba(0,0,0,.05); }
 .gallery-item iframe { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 10px; }
-.yt-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 12px; color: var(--faint); text-decoration: none; }
+.yt-link { display: flex; width: fit-content; align-items: center; gap: 4px; margin-top: 6px; font-size: 12px; color: var(--faint); text-decoration: none; }
 .yt-link .ic { width: 12px; height: 12px; }
 .yt-link:hover { color: var(--ink); }
 
