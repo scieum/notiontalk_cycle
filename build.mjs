@@ -126,7 +126,7 @@ marked.use({
         return `<div class="mini-prompt file-block is-folded" data-fold><h3>${ic("file")}${esc(name)}</h3><pre><code>${esc(code)}</code></pre><button type="button" class="fold-toggle" data-fold-toggle aria-expanded="false"><span class="fold-more">전체 보기</span><span class="fold-less">접기</span></button><div class="file-actions"><a class="btn btn-sm" href="data:text/plain;charset=utf-8,${encodeURIComponent(code)}" download="${esc(name)}">${ic("download")}${esc(name)} 받기</a><button type="button" class="btn btn-secondary btn-sm" data-copy><span class="copy-idle">${ic("copy")}내용 복사</span><span class="copy-done">${ic("check")}복사됐어요</span></button></div></div>`;
       }
       if (lang === "gallery") return galleryHtml(code, rest);
-      if (lang === "bookmarks") return bookmarksHtml(code);
+      if (lang === "bookmarks") return bookmarksHtml(code, rest.join(" "));
       if (lang === "tree") return `<pre class="tree">${esc(code)}</pre>`;
       return `<pre class="code"><code>${esc(code)}</code></pre>`;
     },
@@ -147,10 +147,12 @@ marked.use({
       return `<div class="note-box${name === "alert" ? " note-box--warn" : ""}">${ic(name, "note-ic")}<div>${body}</div></div>`;
     },
     heading(text, level) {
-      // "### 방법 N · 이름", "### 주제 N · 이름"은 구역을 나누는 머리띠가 돼요 (2-1 같은 하위 단계는 그대로)
-      const m = level === 3 && text.match(/^(방법|주제)\s*(\d+)\s*·\s*(.+)$/);
+      // "### 방법·주제·단계 N · 이름"은 구역을 나누는 머리띠가 돼요 (2-1 같은 하위 단계는 그대로)
+      const m = level === 3 && text.match(/^(방법|주제|단계)\s*(\d+)\s*·\s*(.+)$/);
       if (m) return `<div class="method-head"><span class="method-no">${m[1]} ${m[2]}</span><h3>${m[3]}</h3></div>`;
-      if (level === 3 && text === "결과 비교") return `<div class="method-head method-head--cmp"><span class="method-no">비교</span><h3>방법 1 vs 방법 2</h3></div>`;
+      // "### 비교 · 이름"은 노란 비교 머리띠
+      const cmp = level === 3 && text.match(/^비교\s*·\s*(.+)$/);
+      if (cmp) return `<div class="method-head method-head--cmp"><span class="method-no">비교</span><h3>${cmp[1]}</h3></div>`;
       return `<h${level}>${text}</h${level}>`;
     },
     table(header, body) {
@@ -196,9 +198,10 @@ function galleryHtml(code, opts = []) {
 }
 
 // ```bookmarks 블록: 한 줄에 "이름 | 주소 | 설명". 파트마다 필요한 사이트를 북마크 카드로
-function bookmarksHtml(code) {
+// 블록 첫 줄 뒤에 제목을 쓰면(```bookmarks 레퍼런스 참고 사이트) 그 제목으로 나와요
+function bookmarksHtml(code, label) {
   const items = code.trim().split("\n").map((line) => line.split("|").map((x) => x.trim())).filter(([n, u]) => n && u);
-  return `<div class="bookmarks"><p class="bm-label">${ic("link")}필요한 사이트</p><ul>${items.map(([name, url, note = ""]) => {
+  return `<div class="bookmarks"><p class="bm-label">${ic("link")}${esc(label || "필요한 사이트")}</p><ul>${items.map(([name, url, note = ""]) => {
     let host = url;
     try { host = new URL(url).hostname.replace(/^www\./, ""); } catch {}
     return `<li><a class="card bookmark" href="${esc(url)}" target="_blank" rel="noopener"><span class="res-main"><span class="card-title">${esc(name)}</span>${note ? `<span class="card-desc">${esc(note)}</span>` : ""}<span class="bm-host">${esc(host)}</span></span><span class="go">${ic("external")}</span></a></li>`;
