@@ -404,6 +404,17 @@ a:hover .go .ic, .row-head .more:hover .ic { transform: translateX(2px); }
 .fold-box[open] > summary::after { content: "접기"; }
 .fold-box > .gallery { padding: 0 12px 12px; margin: 0; }
 
+/* ```more 제목: 누르면 펼쳐지는 예시 상자 */
+.more-box { margin-top: 14px; }
+.more-box > summary { justify-content: flex-start; }
+.more-box > summary .ic { width: 18px; height: 18px; color: var(--muted); flex: none; }
+.more-box > summary::after { content: "더보기"; margin-left: auto; }
+.more-box[open] > summary::after { content: "접기"; }
+.more-body { padding: 0 18px 16px; border-top: 1px solid var(--line); padding-top: 14px; }
+.more-body > :last-child { margin-bottom: 0; }
+.more-body h4 { margin: 18px 0 8px; font-size: 15px; }
+.more-body h4:first-child { margin-top: 0; }
+
 /* ```gallery 3 fold: 처음엔 두 줄(6개)만 */
 .gallery-fold { margin: 0 0 18px; }
 .gallery-fold > .gallery { margin-bottom: 12px; }

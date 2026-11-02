@@ -144,6 +144,7 @@ marked.use({
       }
       if (lang === "gallery") return galleryHtml(code, rest);
       if (lang === "bookmarks") return bookmarksHtml(code, rest.join(" "));
+      if (lang === "more") return `<details class="fold-box more-box"><summary>${ic("note")}${esc(rest.join(" ") || "예시 보기")}</summary><div class="more-body">${md(code)}</div></details>`;
       if (lang === "tree") return `<pre class="tree">${esc(code)}</pre>`;
       return `<pre class="code"><code>${esc(code)}</code></pre>`;
     },
