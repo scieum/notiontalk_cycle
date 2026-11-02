@@ -33,7 +33,7 @@
 - 맨 아래 "받아가기"에 `resources`(다시보기·슬라이드·파일 등)가 모인다. 비어 있으면 받아가기 칸이 아예 나오지 않는다.
 
 
-주차 안내(비밀번호 잠금): `meta.json`의 `weeks`(`no`, `title`, `start`, `end`, `file`) + 회차 폴더의 `weeks/<file>.md`. 빌드가 본문을 암호화해 `/cycles/<slug>/week-N/`로 내보내고, 목록에 `CYCLE-01(1주차)` 카드가 따로 생긴다. 비밀번호는 저장소에 넣지 않는다: 로컬은 `.env`의 `LOCK_PASSWORD`, 배포는 Vercel 환경변수 `LOCK_PASSWORD`. 없으면 빌드가 멈춘다.
+주차 안내(비밀번호 잠금): `meta.json`의 `weeks`(`no`, `title`, `start`, `end`, `file`, `summary`: 목록 카드에 보일 주제 설명) + 회차 폴더의 `weeks/<file>.md`. 빌드가 본문을 암호화해 `/cycles/<slug>/week-N/`로 내보내고, 목록에 `CYCLE-01(1주차)` 카드가 따로 생긴다. 비밀번호는 저장소에 넣지 않는다: 로컬은 `.env`의 `LOCK_PASSWORD`, 배포는 Vercel 환경변수 `LOCK_PASSWORD`. 없으면 빌드가 멈춘다.
 
 ## 실험 노트 추가 ("실험실에 ○○ 올려줘")
 

@@ -365,7 +365,7 @@ function weekCard(c, w) {
     <span class="exp">CYCLE-${pad2(c.no)}(${w.no}주차)</span>
     <span class="row-body">
       <span class="card-title">${esc(w.title)} <span class="pill status-lock">${ic("lock")}비밀번호</span></span>
-      <span class="card-desc">${esc(c.title)} ${w.no}주차 안내예요. 참여 선생님께 알려드린 비밀번호로 열어요.</span>
+      <span class="card-desc">${esc(w.summary || `${c.title} ${w.no}주차 안내예요. 참여 선생님께 알려드린 비밀번호로 열어요.`)}</span>
       <span class="card-meta">${fmtShort(w.start)} ~ ${fmtShort(w.end)}</span>
     </span>
     <span class="go">열기 ${ic("arrow-right")}</span>
@@ -373,7 +373,7 @@ function weekCard(c, w) {
 }
 
 // 회차마다 주차 카드(최신 주차 먼저) 뒤에 회차 카드
-const cycleCards = () => cycles.flatMap((c) => [...(c.weeks || []).slice().reverse().map((w) => weekCard(c, w)), cycleCard(c)]);
+const cycleCards = () => cycles.flatMap((c) => [cycleCard(c), ...(c.weeks || []).map((w) => weekCard(c, w))]);
 
 function labCard(l) {
   const op = operators[l.author];
