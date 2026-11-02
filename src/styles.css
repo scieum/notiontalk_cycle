@@ -200,7 +200,8 @@ img.avatar { object-fit: cover; background: var(--paper-2); }
 .section p { line-height: 1.75; }
 .section ul { padding-left: 1.2em; }
 .section li + li { margin-top: 6px; }
-.section ul.checks { list-style: none; padding: 0; }
+.section ul.checks, .section ul.resources { list-style: none; padding: 0; }
+.section ul.resources li + li { margin-top: 0; }
 .section h3 { font-size: 18px; margin: 24px 0 10px; }
 .section code { font-family: var(--mono); font-size: .88em; background: var(--paper-2); padding: .1em .35em; border-radius: 5px; }
 .section a { text-underline-offset: 3px; }
@@ -261,6 +262,20 @@ tr:last-child td { border-bottom: 0; }
 .back-link { margin-top: 28px; }
 .back-link a { font-weight: 600; text-decoration: none; }
 .back-link a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* ── 주차 안내 잠금 ─────────── */
+.section-sub { color: var(--muted); font-size: 14px; margin: -8px 0 14px; }
+.week-card .res-type .ic { color: var(--vibe); }
+.status-lock { gap: 4px; background: var(--vibe-soft); color: var(--vibe); }
+.status-lock .ic { width: 12px; height: 12px; }
+.lock { margin-top: 28px; padding: 28px 20px; text-align: center; }
+.lock h2 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+.lock-ic { display: inline-grid; place-items: center; width: 52px; height: 52px; margin-bottom: 14px; border-radius: 14px; background: var(--vibe-soft); color: var(--vibe); }
+.lock-ic .ic { width: 26px; height: 26px; }
+.lock-row { display: flex; gap: 8px; max-width: 320px; margin: 18px auto 0; }
+.lock-input { flex: 1; min-width: 0; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); font: inherit; font-size: 18px; letter-spacing: .3em; text-align: center; }
+.lock-input:focus { outline: none; border-color: var(--ink); }
+.lock-msg { min-height: 1.5em; margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--live); }
 
 /* ── 하단 ─────────────────── */
 .foot { max-width: 880px; margin: 72px auto 0; padding: 28px 16px 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }

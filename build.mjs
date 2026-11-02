@@ -12,6 +12,16 @@ const CONTENT = path.join(ROOT, "content");
 const DIST = path.join(ROOT, "dist");
 const VERSION = Date.now().toString(36);
 
+// 주차 안내 비밀번호: 저장소에 넣지 않고 .env(로컬, git 제외) 또는 Vercel 환경변수 LOCK_PASSWORD로 받아요
+const ENV_FILE = path.join(ROOT, ".env");
+if (fs.existsSync(ENV_FILE)) {
+  for (const line of fs.readFileSync(ENV_FILE, "utf8").split(/\r?\n/)) {
+    const m = line.match(/^\s*([\w.]+)\s*=\s*(.*?)\s*$/);
+    if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  }
+}
+const LOCK_PASSWORD = process.env.LOCK_PASSWORD;
+
 const site = readJson(path.join(CONTENT, "site.json"));
 const operators = Object.fromEntries(site.operators.map((o) => [o.id, o]));
 const TRACKS = {
@@ -39,7 +49,7 @@ const EMOJI_ICONS = {
   "🎯": "target", "💡": "bulb", "📋": "prompt", "📦": "package", "🧪": "flask", "🗺": "map", "📅": "calendar",
   "▶": "play", "📑": "slides", "🧩": "template", "📄": "file", "🔗": "link", "🛠": "wrench", "🔧": "wrench",
   "⬇": "download", "💬": "chat", "✉": "mail", "📡": "radio", "🏠": "home", "✨": "sparkles", "💛": "heart",
-  "❤": "heart", "✅": "check", "✔": "check",
+  "❤": "heart", "✅": "check", "✔": "check", "📝": "note", "🎬": "film", "🔒": "lock",
 };
 const EMOJI_RE = /(\p{Extended_Pictographic})\uFE0F?/gu;
 // 제목 앞 이모지를 떼고 아이콘 이름을 돌려줘요
@@ -84,6 +94,13 @@ for (const c of cycles) {
     if (!c.schedule?.[key]) throw new Error(`${c.slug}: schedule.${key}가 필요해요`);
   }
 }
+for (const c of cycles) {
+  for (const w of c.weeks || []) {
+    if (!LOCK_PASSWORD) throw new Error(`${c.slug}: 주차 안내를 잠그려면 LOCK_PASSWORD가 필요해요 (.env 또는 Vercel 환경변수)`);
+    w.slug = `week-${w.no}`;
+    w.body = fs.readFileSync(path.join(c.folder, "weeks", w.file), "utf8");
+  }
+}
 for (const l of labs) {
   if (!operators[l.author]) throw new Error(`${l.slug}: author "${l.author}"가 site.json operators에 없어요`);
 }
@@ -100,7 +117,7 @@ const fmtShort = (v) => { const p = parts(v, { month: "numeric", day: "numeric",
 const fmtTime = (v) => timeText(kst(v));
 
 const scheduleAttr = (s) =>
-  `data-schedule='${esc(JSON.stringify({ announce: s.announce, live: s.live, end: s.end, review: s.review || null }))}'`;
+  `data-schedule='${esc(JSON.stringify({ announce: s.announce, live: s.live, end: s.end, review: s.review || null, done: !!s.done }))}'`;
 
 function avatar(op, cls = "") {
   // 프로필 사진(site.json의 photo, notiontalk.com 운영진 사진)이 있으면 사진, 없으면 이름 첫 글자
@@ -341,6 +358,23 @@ function cycleCard(c) {
   </a>`;
 }
 
+// 주차 안내도 목록에 따로 한 칸씩 (비밀번호로 열어요)
+function weekCard(c, w) {
+  return `<a class="card row-card" href="/cycles/${c.slug}/${w.slug}/">
+    <span class="thumb">${thumb(c, "cycles")}</span>
+    <span class="exp">CYCLE-${pad2(c.no)}(${w.no}주차)</span>
+    <span class="row-body">
+      <span class="card-title">${esc(w.title)} <span class="pill status-lock">${ic("lock")}비밀번호</span></span>
+      <span class="card-desc">${esc(c.title)} ${w.no}주차 안내예요. 참여 선생님께 알려드린 비밀번호로 열어요.</span>
+      <span class="card-meta">${fmtShort(w.start)} ~ ${fmtShort(w.end)}</span>
+    </span>
+    <span class="go">열기 ${ic("arrow-right")}</span>
+  </a>`;
+}
+
+// 회차마다 주차 카드(최신 주차 먼저) 뒤에 회차 카드
+const cycleCards = () => cycles.flatMap((c) => [...(c.weeks || []).slice().reverse().map((w) => weekCard(c, w)), cycleCard(c)]);
+
 function labCard(l) {
   const op = operators[l.author];
   return `<a class="card row-card" href="/lab/${l.slug}/">
@@ -469,7 +503,7 @@ function homePage() {
 <section class="preview">
   <div class="row" id="cycle">
     ${rowHead("cycle", "회차별 자료", "/cycles/")}
-    ${cycles.slice(0, 3).map(cycleCard).join("") || empty("첫 회차를 준비하고 있어요.")}
+    ${cycleCards().slice(0, 3).join("") || empty("첫 회차를 준비하고 있어요.")}
   </div>
   <div class="row" id="lab">
     ${rowHead("lab", "운영진 실험 노트", "/lab/")}
@@ -586,6 +620,60 @@ ${related.length ? `<section class="section" id="notes" aria-labelledby="notes-t
   });
 }
 
+/* ── 주차 안내 (비밀번호 잠금) ───────────── */
+
+// 본문 HTML을 비밀번호로 암호화해요 (PBKDF2 → AES-GCM). 페이지 소스에는 암호문만 남아요.
+const LOCK_ITER = 250000;
+const b64 = (buf) => Buffer.from(buf).toString("base64");
+async function encrypt(html, password) {
+  const { subtle } = globalThis.crypto;
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const base = await subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+  const key = await subtle.deriveKey({ name: "PBKDF2", salt, iterations: LOCK_ITER, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt"]);
+  const data = await subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(html));
+  return { salt: b64(salt), iv: b64(iv), iter: LOCK_ITER, data: b64(data) };
+}
+
+function weekPage(c, w, locked) {
+  return layout({
+    title: `${c.no}회차 ${w.no}주차 안내`,
+    description: `${c.no}회차 ${w.no}주차 안내 (비밀번호가 필요해요)`,
+    path: `/cycles/${c.slug}/${w.slug}/`,
+    active: "cycles",
+    back: [`/cycles/${c.slug}/`, `${c.no}회차로 돌아가기`],
+    body: `<div class="wrap">
+<section class="recipe-hero">
+  <p class="kicker">${ic("calendar")}${c.no}회차 · ${w.no}주차</p>
+  <h1>${esc(w.title)}</h1>
+  <p class="lead"><strong>${fmtShort(w.start)} ~ ${fmtShort(w.end)}</strong></p>
+</section>
+<form class="card lock" data-lock="${esc(c.slug)}" novalidate>
+  <span class="lock-ic">${ic("lock")}</span>
+  <h2>비밀번호를 넣어주세요</h2>
+  <p class="card-desc">참여 선생님께 알려드린 비밀번호로 이번 주 안내가 열려요.</p>
+  <div class="lock-row">
+    <label class="sr-only" for="lock-pw">비밀번호</label>
+    <input id="lock-pw" class="lock-input" type="password" inputmode="numeric" autocomplete="off" required>
+    <button class="btn" type="submit">${ic("unlock")}열기</button>
+  </div>
+  <p class="lock-msg" role="alert"></p>
+</form>
+<div class="locked-body" hidden></div>
+<script type="application/json" id="locked-data">${JSON.stringify(locked)}</script>
+<script type="module" src="/assets/lock.js?v=${VERSION}"></script>
+<p class="back-link"><a href="/cycles/${c.slug}/">${ic("arrow-left")}${c.no}회차 페이지로</a></p>
+</div>`,
+  });
+}
+
+function weekBody(w) {
+  const { intro, list } = sections(w.body);
+  return `${jumpNav(list.map((s) => [s.id, plain(s.title)]))}
+${intro ? `<section class="section">${md(intro)}</section>` : ""}
+${list.map(sectionHtml).join("")}`;
+}
+
 /* ── 실험 노트 상세 ────────────────────── */
 
 function labPage(l) {
@@ -661,14 +749,14 @@ function copy(src, dest) {
 // 회차·실험 폴더 안의 첨부 파일(meta.json, index.md 제외)을 같은 주소로 복사해요
 function copyAttachments(entry, base) {
   for (const name of fs.readdirSync(entry.folder)) {
-    if (name === "meta.json" || name === "index.md") continue;
+    if (name === "meta.json" || name === "index.md" || name === "weeks") continue; // weeks/는 암호화해서만 내보내요
     copy(path.join(entry.folder, name), path.join(DIST, base, entry.slug, name));
   }
 }
 
 fs.rmSync(DIST, { recursive: true, force: true });
 fs.mkdirSync(path.join(DIST, "assets"), { recursive: true });
-for (const f of ["styles.css", "demos.css", "app.js", "phase.js", "hero.js"]) fs.copyFileSync(path.join(ROOT, "src", f), path.join(DIST, "assets", f));
+for (const f of ["styles.css", "demos.css", "app.js", "phase.js", "hero.js", "lock.js"]) fs.copyFileSync(path.join(ROOT, "src", f), path.join(DIST, "assets", f));
 copy(ICON_DIR, path.join(DIST, "assets", "icons"));
 if (fs.existsSync(path.join(ROOT, "public"))) copy(path.join(ROOT, "public"), DIST);
 
@@ -676,9 +764,13 @@ write("index.html", homePage());
 write("cycles/index.html", listPage({
   title: "cycle", sub: "회차별 자료", path: "/cycles/", active: "cycles",
   lead: "2주마다 한 주제. 라이브 다시보기와 발표 자료, 따라 할 프롬프트를 회차별로 모았어요.",
-  items: cycles.map(cycleCard).join("") || empty("첫 회차를 준비하고 있어요."),
+  items: cycleCards().join("") || empty("첫 회차를 준비하고 있어요."),
 }));
-for (const c of cycles) { write(`cycles/${c.slug}/index.html`, cyclePage(c)); copyAttachments(c, "cycles"); }
+for (const c of cycles) {
+  write(`cycles/${c.slug}/index.html`, cyclePage(c));
+  copyAttachments(c, "cycles");
+  for (const w of c.weeks || []) write(`cycles/${c.slug}/${w.slug}/index.html`, weekPage(c, w, await encrypt(weekBody(w), LOCK_PASSWORD)));
+}
 write("lab/index.html", listPage({
   title: "lab", sub: "운영진 실험 노트", path: "/lab/", active: "lab",
   lead: "챌린지 주제를 먼저 해보면서 막혔던 곳, 통했던 프롬프트, 만든 결과물을 그대로 남겨요.",

@@ -25,30 +25,31 @@ function legacyCopy(text) {
   return ok;
 }
 
-document.querySelectorAll("[data-copy]").forEach((btn) => {
-  let doneTimer;
-  btn.addEventListener("click", async () => {
-    const code = btn.closest(".mini-prompt").querySelector("code");
-    const text = code.textContent;
-    let ok = false;
-    try {
-      if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); ok = true; }
-    } catch { ok = false; }
-    if (!ok) ok = legacyCopy(text);
-    if (ok) {
-      btn.classList.add("is-done");
-      clearTimeout(doneTimer);
-      doneTimer = setTimeout(() => btn.classList.remove("is-done"), 1600);
-      showToast("복사됐어요!");
-    } else {
-      const range = document.createRange();
-      range.selectNodeContents(code);
-      const sel = getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-      showToast("자동 복사가 안 돼서 전체를 선택해뒀어요. 길게 눌러 복사해주세요!");
-    }
-  });
+// 잠금이 풀리며 나중에 생기는 버튼도 잡도록 문서에서 한 번에 받아요
+const doneTimers = new WeakMap();
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest("[data-copy]");
+  if (!btn) return;
+  const code = btn.closest(".mini-prompt").querySelector("code");
+  const text = code.textContent;
+  let ok = false;
+  try {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); ok = true; }
+  } catch { ok = false; }
+  if (!ok) ok = legacyCopy(text);
+  if (ok) {
+    btn.classList.add("is-done");
+    clearTimeout(doneTimers.get(btn));
+    doneTimers.set(btn, setTimeout(() => btn.classList.remove("is-done"), 1600));
+    showToast("복사됐어요!");
+  } else {
+    const range = document.createRange();
+    range.selectNodeContents(code);
+    const sel = getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    showToast("자동 복사가 안 돼서 전체를 선택해뒀어요. 길게 눌러 복사해주세요!");
+  }
 });
 
 /* ── 단계 표시: 빌드 시점이 아니라 지금 기준으로 다시 계산 ── */

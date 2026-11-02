@@ -7,7 +7,8 @@
     "vote": null,
     "announce": "2026-10-26",
     "live": "2026-11-01T20:00:00+09:00",
-    "end": "2026-11-15"
+    "end": "2026-11-15",
+    "done": true
   },
   "hosts": [
     "chemi"
@@ -24,6 +25,10 @@
       "url": "/cycles/01-motion-graphics/notiontalk-cycle01-motion-graphics.pptx",
       "note": "라이브에서 쓴 슬라이드"
     }
+  ],
+  "weeks": [
+    { "no": 1, "title": "1차 사이클", "start": "2026-11-02", "end": "2026-11-08", "file": "week-1.md" },
+    { "no": 2, "title": "2차 사이클", "start": "2026-11-09", "end": "2026-11-15", "file": "week-2.md" }
   ],
   "lab": []
 }

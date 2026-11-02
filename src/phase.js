@@ -32,7 +32,7 @@ export function phaseOf(schedule, now = new Date()) {
   const liveDay = kstDayStart(live);
   const liveDayEnd = new Date(liveDay.getTime() + DAY);
 
-  if (now >= endExclusive) return 5;
+  if (schedule.done || now >= endExclusive) return 5; // "done": true면 날짜와 상관없이 완료
   if (now >= review) return 4;
   if (now >= liveDayEnd) return 3;
   if (now >= liveDay) return 2;
