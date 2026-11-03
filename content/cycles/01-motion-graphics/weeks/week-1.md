@@ -62,4 +62,5 @@ https://www.youtube.com/watch?v=… (물의 순환을 설명하는 2분짜리 �
 
 ```bookmarks 기록 열어 보기
 영상 소스 0개로 홍보 릴스 만들기 | https://claude.ai/artifact/N9QqhKXTRNEFcNVxtYzYi9 | 물에맛.Zip 홍보 숏츠(9:16, 49초)를 화면 녹화 → 스틸컷 선별 → 기획 문서 4개 → 장면별 피드백 4회로 만든 기록
+영상 전에 스토리보드부터 만든 숏츠 | https://claude.ai/artifact/2QafdGJoyAMZ1hnuKcQ3aN | EDEN 홍보 숏츠(9:16, 60초)를 소스 녹화 → 스틸컷 전달 → 스토리보드 5판 수정 → 영상 순서로 만든 기록
 ```
