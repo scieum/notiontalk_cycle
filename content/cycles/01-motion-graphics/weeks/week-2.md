@@ -18,8 +18,7 @@
 
 **내 수업용 모션 하네스 정리하기**
 
-1. 시작 저장소를 받아요 (아래 준비물)
-2. 아래 **A · 처음 한 번** 프롬프트 ①~⑥을 순서대로 하나씩 보내요
+1. 아래 **A · 처음 한 번** 프롬프트 ⓪~⑥을 순서대로 하나씩 보내요. ⓪·①이 도구 설치와 시작 저장소 받기까지 해요
 
 > 📦 제출: 하네스 파일 트리 캡처 + `motion.md`
 
@@ -35,13 +34,31 @@
 
 ## 🧰 준비물 (한 번만)
 
-1. Claude 데스크톱 앱(Pro 이상)의 **Code** 탭
-2. Node.js 22 이상, FFmpeg, HyperFrames (1주차 파트 6에서 설치했다면 그대로 써요)
+아직 안 깔려 있을 가능성이 커요. 아래 순서대로 깔아 주세요. 1주차 파트 6에서 이미 깔았다면 프롬프트 ⓪으로 확인만 하고 넘어가요.
+
+| 순서 | 도구 | 왜 필요해요 | 까는 법 |
+| --- | --- | --- | --- |
+| 1 | Claude 데스크톱 앱 (Pro 이상) | 작업은 왼쪽 위 **Code** 탭(Claude Code)에서 해요 | claude.ai/download에서 받아 설치 |
+| 2 | Node.js 22 이상 | HyperFrames 설치와 영상 렌더 | nodejs.org에서 **LTS** 버전을 받아 설치 |
+| 3 | FFmpeg | mp4 렌더, 레퍼런스 영상 분석 | Mac: `brew install ffmpeg` · Windows: `winget install Gyan.FFmpeg` |
+| 4 | HyperFrames | HTML로 영상을 만드는 도구 | 프롬프트 ①이 저장소를 받은 뒤 그 폴더에 설치해요 (`npx skills add heygen-com/hyperframes`) |
+
+```bookmarks 설치 사이트
+Claude 데스크톱 앱 | https://claude.ai/download | Mac · Windows 앱을 받아요. 설치 뒤 왼쪽 위 Code 탭을 열어요
+Node.js | https://nodejs.org | 첫 화면의 LTS 버전을 받아 설치해요
+Homebrew (Mac만) | https://brew.sh | Mac에서 brew 명령이 없다고 나오면 먼저 깔아요
+```
+
+> 💡 명령어 입력이 낯설면 직접 치지 않아도 돼요. Code 탭에서 프롬프트 ⓪을 보내면 Claude가 무엇이 없는지 확인하고, 내 컴퓨터에 맞는 설치 명령을 실행해도 되는지 물어봐요. Node.js를 새로 깔았다면 Claude 앱을 껐다 켜야 인식해요.
+
+이 밖에 준비할 것:
+
+1. 가르칠 단원의 교과서 PDF
+2. 레퍼런스 영상 한 편 (움직임을 잴 영상)
 3. 시작 저장소: 디자인 재료(신문 다큐 룩 `design.md`, 부품 7종, 글꼴·질감·사진)와 교과서 .md 형식 규칙이 들어 있어요. `motion.md`, `video.md`, 하네스 파일은 아래 프롬프트로 직접 만들어요.
-4. 가르칠 단원의 교과서 PDF, 레퍼런스 영상 한 편
 
 ```bookmarks 시작 저장소
-notiontalk_cycle_harness | https://github.com/scieum/notiontalk_cycle_harness | Code 탭에서 "이 저장소를 클론해줘"라고 하거나, Code → Download ZIP으로 받아 폴더를 열어요
+notiontalk_cycle_harness | https://github.com/scieum/notiontalk_cycle_harness | 프롬프트 ①이 클론까지 해요. 막히면 깃허브에서 Code → Download ZIP으로 받아 그 폴더를 열어요
 ```
 
 > ⚠️ 교과서 원문은 깃허브에 올리지 마세요. 출판사 교과서 본문을 공개 저장소에 올리면 재배포가 돼요. 시작 저장소의 `.gitignore`가 교과서 PDF와 단원 원문 파일을 막아 두었어요.
@@ -50,8 +67,15 @@ notiontalk_cycle_harness | https://github.com/scieum/notiontalk_cycle_harness | 
 
 복사해서 붙여 넣는 순서 그대로예요. **한 번에 한 프롬프트씩** 보내고, 결과를 확인한 뒤 다음으로 넘어가요.
 
-```prompt ① 저장소 둘러보기
-이 저장소를 둘러보고 폴더마다 무엇이 들어 있는지, 내가 앞으로 무엇을 만들어야 하는지 쉬운 말로 설명해줘. 아직 아무것도 만들지 마.
+```prompt ⓪ 도구 확인
+수업 모션 영상을 만들 준비를 하려고 해. 내 컴퓨터에 Node.js(22 이상)와 FFmpeg가 깔려 있는지 확인해줘.
+없는 게 있으면 내 운영체제에 맞는 설치 방법을 알려주고, 설치 명령은 실행해도 되는지 먼저 물어봐.
+```
+
+```prompt ① 저장소 받고 둘러보기
+https://github.com/scieum/notiontalk_cycle_harness 이 저장소를 클론해줘.
+클론한 폴더에서 npx skills add heygen-com/hyperframes 를 실행해서 HyperFrames를 설치해줘.
+그다음 폴더마다 무엇이 들어 있는지, 내가 앞으로 무엇을 만들어야 하는지 쉬운 말로 설명해줘. 하네스 문서는 아직 아무것도 만들지 마.
 ```
 
 ```prompt ② 교과서 넣기 (PDF 첨부)
@@ -89,21 +113,111 @@ docs/video.md를 만들어줘. 교실 TV로 보는 수업 영상 기준이야.
 
 > 💡 ⑥을 꼭 해 주세요. 문서끼리 부딪치는 규칙을 영상 만들기 전에 미리 잡아 줘요. 리허설에서는 "글줄은 2줄까지" 규칙과 기사 조각 부품의 폭이 서로 맞지 않는 게 여기서 걸렸어요.
 
-```more 하네스를 만들면 생기는 폴더와 역할
+## 📄 만들어지는 문서
+
+선생님이 직접 타이핑하는 문서는 없어요. 프롬프트를 보내고 질문에 답하면 Claude가 만들어요.
+
+```more 전체 폴더 지도 펼쳐 보기 (예시: 한국사2 1910년대 영상)
+**[받음]** 시작 저장소에 원래 들어 있는 것 · **[준비]** 처음 한 번, 프롬프트 ⓪~⑥으로 만드는 것 · **[영상]** 영상 한 편마다 생기는 것
+
     notiontalk_cycle_harness/
-    ├─ docs/
-    │  ├─ design.md          ← 받은 재료
-    │  ├─ textbook/          ← ② 단원별 .md + index.md 목차
-    │  ├─ motion.md          ← ③
-    │  └─ video.md           ← ④
-    ├─ src/parts/            ← 받은 재료: 부품 7종
-    ├─ CLAUDE.md             ← ⑤ 꼭 지킬 규칙
-    ├─ .claude/agents/       ← ⑤ 역할 5개
-    ├─ .claude/skills/make-video/  ← ⑤ 작업 순서
-    └─ out/<영상이름>/        ← 영상마다: 브리프 · 교과서 정리 · 장면표 · 스냅보드 · gates.md · mp4
+    ├── CLAUDE.md                         [준비] 목적 · 규칙 3개 · 폴더 · 고정/참조/금지 · 작업 순서
+    ├── .gitignore                        [받음] 교과서 원문이 공개 저장소에 안 올라가게 막음
+    │
+    ├── .claude/
+    │   ├── agents/                       [준비] 일하는 사람 5명
+    │   │   ├── content-editor.md         교과서 → lesson-notes
+    │   │   ├── art-director.md           레퍼런스 → beat-sheet · decisions
+    │   │   ├── director.md               장면표 3안 → scenes.md
+    │   │   ├── builder.md                스냅보드 · 영상 제작
+    │   │   └── critic.md                 판정만 (gates.md)
+    │   └── skills/
+    │       └── make-video/SKILL.md       [준비] "수업 영상 만들자" 단계표
+    │
+    ├── docs/                             ── 기준 문서 (값은 여기서만)
+    │   ├── design.md                     [받음] 색 · 글꼴 · 크기 · 질감 · 부품 목록
+    │   ├── motion.md                     [준비] 움직임 1~5장 (레퍼런스에서 잼)
+    │   ├── video.md                      [준비] 글자 크기 · 배경 · 화면 틀 · 표기
+    │   └── textbook/
+    │       ├── _format.md                [받음] 교과서 md 형식
+    │       ├── index.md                  [받음→준비] 목차 (교과서 넣으면 채워짐)
+    │       ├── sample-unit.md            [받음] 예시 원고
+    │       └── 1-01-1-무단통치.md …       [준비] 교과서 변환본 ※ 공개 저장소에 안 올림
+    │
+    ├── src/                              ── 재료
+    │   ├── parts/                        [받음] 부품 7개 + tokens.css
+    │   │   ├── tokens.css
+    │   │   ├── paper-ground.html · year-card.html · headline-page.html
+    │   │   ├── portrait-clipping.html · clipping-note.html · stamp.html · label-tag.html
+    │   │   └── _check/*.jpg              부품 견본 사진
+    │   └── assets/
+    │       ├── fonts/                    [받음] Noto Serif KR · Pretendard + 라이선스
+    │       ├── textures/                 [받음] paper.jpg · newsprint.png · grain.png
+    │       └── photos/
+    │           ├── SOURCES.md            [받음, 영상마다 한 줄씩 추가] 사진 출처
+    │           ├── sample-*.png          [받음] 예시 판화
+    │           ├── plate-*.png           [영상] 이번 영상용 판화
+    │           └── _make/                [영상] 판화 만드는 코드
+    │
+    ├── references/                       ── 레퍼런스 (있을 때만)
+    │   └── periodic-1869/
+    │       ├── original.mp4              [준비] motion.md를 잰 영상
+    │       └── beat-sheet.md             [영상] 레퍼런스를 영상에 쓸 때만
+    │
+    └── out/                              ── 영상 한 편 = 폴더 하나 ※ 공개 저장소에 안 올림
+        └── 1910s/
+            ├── BRIEF.md                  [영상] 0  단원 · 길이 · 레퍼런스
+            ├── lesson-notes.md           [영상] 1  교과서 정리 (쪽수)          ✋①
+            ├── decisions.md              [영상] 2  레퍼런스의 새 모션 후보 (있을 때만)
+            ├── scenes.md                 [영상] 3  장면표                      ✋②
+            ├── snap/                     [영상] 4  스냅보드                    ✋③
+            │   ├── S1.jpg … S8.jpg
+            │   └── overview.jpg
+            ├── index.html                [영상] 5  HyperFrames 본체
+            ├── compositions/s1~s8.html   [영상] 5  장면 파일
+            ├── assets/                   [영상] 5  src/assets에서 복사한 글꼴 · 질감 · 사진
+            ├── _build/build.py           [영상] 5  장면 파일 생성 코드
+            ├── hyperframes.json · package.json · meta.json   [영상] 5  설정
+            ├── gates.md                  [영상] 단계마다 critic 판정 누적
+            ├── log.md                    [영상] 승인 · 수정 요청 · 결정 기록
+            └── 1910s.mp4                 [영상] 6  완성 영상
 
-#### 역할 5개
+#### 이렇게 보면 돼요
 
+- **위에서 아래로 갈수록 자주 바뀌어요.** `CLAUDE.md`와 agents는 거의 안 바뀌고, docs는 마지막 "규칙 남기기" 때 한 줄씩 늘고, out은 영상마다 새로 생겨요.
+- **out 폴더 하나만 보면 영상 한 편의 전 과정이 보여요.** 파일 순서가 곧 작업 순서예요(BRIEF → lesson-notes → scenes → snap → gates → mp4). "어디까지 했지?"를 확인할 때 여기를 보면 돼요.
+- **공개 저장소에 올리지 않는 곳은 두 곳이에요.** `docs/textbook/`의 교과서 변환본과 `out/`이에요. 둘 다 교과서 원문이 들어 있어요.
+```
+
+**처음 한 번 만드는 문서 (A)**
+
+| 문서 | 만드는 프롬프트 | 하는 일 |
+| --- | --- | --- |
+| `docs/design.md` | 받은 재료 | 색 · 글꼴 · 질감 · 부품 목록. "이 문서에 있는 값만 쓴다" |
+| `src/parts/` | 받은 재료 | 신문 스타일 부품 7종. 디자인은 두고 내용만 갈아 끼워요 |
+| `docs/textbook/소단원.md` | ② | 교과서 원문을 쪽수와 함께 옮긴 단원 파일 |
+| `docs/textbook/index.md` | ② | 단원명 · 파일 · 쪽 범위 목차 |
+| `docs/motion.md` | ③ | 움직임 기준: 길이 · 곡선 · 거리, 등장 · 퇴장 · 강조 · 전환, 부품별 동작, 머무는 시간, 카메라 |
+| `docs/video.md` | ④ | 영상 룩: 글자 최소 크기 · 배경 · 화면 틀 · 표기 규칙 |
+| `CLAUDE.md` | ⑤ | 꼭 지킬 규칙 3개와 작업 순서. Claude가 매번 먼저 읽어요 |
+| `.claude/agents/` 5개 | ⑤ | 역할 나누기: 교과서 정리 · 레퍼런스 정리 · 장면표 · 제작 · 판정 |
+| `.claude/skills/make-video/SKILL.md` | ⑤ | "수업 영상 만들자"로 켜지는 작업 순서와 승인 지점 |
+
+**영상마다 생기는 문서 (B)** · `out/<영상이름>/` 폴더에 따로 모여요
+
+| 문서 | 언제 생기나 | 하는 일 |
+| --- | --- | --- |
+| 브리프 | 시작 | 단원 · 길이 · 쓰는 곳 · 레퍼런스 |
+| 교과서 정리 | 승인 ① 전 | 이번 영상에 쓸 개념 · 용어 · 수치를 쪽수와 함께 |
+| 레퍼런스 정리 | 레퍼런스가 있을 때 | 구성 · 전환 · 박자 |
+| 장면표 | 승인 ② 전 | 장면마다 내용 · 움직임 · 전환 |
+| 스냅보드 | 승인 ③ 전 | 장면마다 정지 화면 한 장 |
+| `gates.md` | 생성 · 검수 | critic의 통과 · 불통과 기록 |
+| mp4 | 렌더 | 완성 영상 |
+
+> 💡 영상마다 생기는 문서의 파일 이름은 ⑤에서 만든 하네스에 따라 조금 다를 수 있어요. ⑤ 끝에 Claude가 알려 주는 "파일이 하는 일" 목록과 맞춰 보세요.
+
+```more 역할 5개 자세히 보기
 | 에이전트 | 하는 일 |
 | --- | --- |
 | content-editor | 고른 단원에서 개념·용어·수치를 **쪽수와 함께** 정리해요 |
