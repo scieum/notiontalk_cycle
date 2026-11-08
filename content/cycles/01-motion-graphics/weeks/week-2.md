@@ -58,12 +58,21 @@ Homebrew (Mac만) | https://brew.sh | Mac에서 brew 명령이 없다고 나오�
 3. 시작 저장소: 디자인 재료(신문 다큐 룩 `design.md`, 부품 7종, 글꼴·질감·사진)와 교과서 .md 형식 규칙이 들어 있어요. `motion.md`, `video.md`, 하네스 파일은 아래 프롬프트로 직접 만들어요.
 
 ```bookmarks 시작 저장소
-notiontalk_cycle_harness | https://github.com/scieum/notiontalk_cycle_harness | 프롬프트 ①이 클론까지 해요. 막히면 깃허브에서 Code → Download ZIP으로 받아 그 폴더를 열어요
+notiontalk_cycle_harness | https://github.com/scieum/notiontalk_cycle_harness | 프롬프트 ①이 클론까지 해요. 막히면 깃허브에서 Code → Download ZIP으로 받아 압축을 풀고, 그 폴더를 Code 탭 세션 폴더로 골라요
 ```
 
 > ⚠️ 교과서 원문은 깃허브에 올리지 마세요. 출판사 교과서 본문을 공개 저장소에 올리면 재배포가 돼요. 시작 저장소의 `.gitignore`가 교과서 PDF와 단원 원문 파일을 막아 두었어요.
 
 ## 📋 A · 처음 한 번 (준비)
+
+프롬프트를 보내기 전에 **Code 탭에서 작업 환경부터** 만들어요. 일반 채팅 창에서는 하네스가 동작하지 않아요.
+
+1. Claude 데스크톱 앱 왼쪽 위에서 **Code** 탭을 눌러요
+2. 새 세션을 열어요
+3. 작업할 폴더를 고르라고 나오면, **빈 폴더를 하나 새로 만들어** 골라요 (예: `문서/수업모션`)
+4. 이 세션 창에서 아래 프롬프트를 보내요
+
+> ⚠️ 다음에 영상을 만들 때도 꼭 **같은 폴더**로 세션을 열어요. 다른 폴더에서 열면 "수업 영상 만들자"가 켜지지 않아요.
 
 복사해서 붙여 넣는 순서 그대로예요. **한 번에 한 프롬프트씩** 보내고, 결과를 확인한 뒤 다음으로 넘어가요.
 
@@ -73,9 +82,9 @@ notiontalk_cycle_harness | https://github.com/scieum/notiontalk_cycle_harness | 
 ```
 
 ```prompt ① 저장소 받고 둘러보기
-https://github.com/scieum/notiontalk_cycle_harness 이 저장소를 클론해줘.
-클론한 폴더에서 npx skills add heygen-com/hyperframes 를 실행해서 HyperFrames를 설치해줘.
-그다음 폴더마다 무엇이 들어 있는지, 내가 앞으로 무엇을 만들어야 하는지 쉬운 말로 설명해줘. 하네스 문서는 아직 아무것도 만들지 마.
+https://github.com/scieum/notiontalk_cycle_harness 이 저장소를 지금 작업 폴더에 바로 클론해줘. 하위 폴더를 따로 만들지 말고, 이 폴더가 곧 저장소가 되게 해줘.
+그다음 이 폴더에서 npx skills add heygen-com/hyperframes 를 실행해서 HyperFrames를 설치해줘.
+마지막으로 폴더마다 무엇이 들어 있는지, 내가 앞으로 무엇을 만들어야 하는지 쉬운 말로 설명해줘. 하네스 문서는 아직 아무것도 만들지 마.
 ```
 
 ```prompt ② 교과서 넣기 (PDF 첨부)
@@ -229,7 +238,7 @@ docs/video.md를 만들어줘. 교실 TV로 보는 수업 영상 기준이야.
 
 ## 🎬 B · 영상 한 편마다
 
-준비(A)는 처음 한 번이에요. 다음 영상부터는 "**수업 영상 만들자**" 한 줄로 시작해요. 승인 지점에서는 Claude가 멈추고 기다려요.
+준비(A)는 처음 한 번이에요. 다음 영상부터는 Code 탭에서 **A에서 만든 그 폴더**로 새 세션을 열고 "**수업 영상 만들자**" 한 줄로 시작해요. 승인 지점에서는 Claude가 멈추고 기다려요.
 
 | 언제 | 이렇게 말해요 |
 | --- | --- |
