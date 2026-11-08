@@ -214,7 +214,9 @@ img.avatar { object-fit: cover; background: var(--paper-2); }
 
 .note-box { background: var(--hl); color: var(--ink); border-radius: 14px; padding: 14px 18px; margin: 0 0 16px; }
 .note-box p, .note-box ul { margin: 0; }
-.note-box p + p { margin-top: 6px; }
+.note-box p + p, .note-box p + ul, .note-box ul + p { margin-top: 10px; }
+.note-box li + li { margin-top: 10px; }
+.note-box .sb { display: block; height: 10px; }
 .note-box ul { list-style: none; padding: 0; }
 
 .mini-prompt { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin: 0 0 16px; }
